@@ -42,8 +42,9 @@ app.get('/api/hello', function (req, res) {
 
 const addNewUrl = require("./mongoConfig.js").addNewUrl;
 
-app.get("/api/shorturl", (req, res) => {
-  dns.lookup('example.com', (err, address, family) => {
+app.post("/api/shorturl", (req, res) => {
+  const longUrl = req.body.url;
+  dns.lookup(longUrl, (err, address, family) => {
     if (err !== null) {
       return res.json({ error: 'invalid url' });
     }
