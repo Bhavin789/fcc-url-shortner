@@ -6,6 +6,20 @@ const app = express();
 
 const bodyParser = require('body-parser');
 
+let mongoose;
+try {
+  mongoose = require("mongoose");
+} catch (e) {
+  console.log(e);
+}
+
+app.get("/is-mongoose-ok", function (req, res) {
+  if (mongoose) {
+    res.json({ isMongooseOk: !!mongoose.connection.readyState });
+  } else {
+    res.json({ isMongooseOk: false });
+  }
+});
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
@@ -26,16 +40,22 @@ app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+const addNewUrl = require("./mongoConfig.js").addNewUrl;
+
 app.get("/api/shorturl", (req, res) => {
   dns.lookup('example.com', (err, address, family) => {
-    if(err !== null){
+    if (err !== null) {
       return res.json({ error: 'invalid url' });
     }
     /**
-     * if the url is correct, save it to the db with a random * number
+     * if the url is correct, save it to the db with a random * short uri
      */
-    console.log('address: %j family: IPv%s', address, family)
-    res.json({ success: true });
+    addNewUrl('example.com', (err, response) => {
+      if (err !== null) {
+        return res.json({ error: 'unable to insert to the db' });
+      }
+      return res.json({ original_url: response.longUrl, short_url: response.shortUrl });
+    })
   }
   );
 })
