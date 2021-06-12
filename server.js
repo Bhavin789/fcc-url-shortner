@@ -4,10 +4,16 @@ const cors = require('cors');
 const dns = require('dns');
 const app = express();
 
+const bodyParser = require('body-parser');
+
+
 // Basic Configuration
 const port = process.env.PORT || 3000;
 
 app.use(cors());
+
+app.use(bodyParser.urlencoded({ extended: "false" }));
+app.use(bodyParser.json());
 
 app.use('/public', express.static(`${process.cwd()}/public`));
 
@@ -32,6 +38,11 @@ app.get("/api/shorturl", (req, res) => {
     res.json({ success: true });
   }
   );
+})
+
+app.get("/api/shorturl/:url", (req, res) => {
+  const url = req.params.url;
+  res.redirect("http://example.com");
 })
 
 app.listen(port, function () {
